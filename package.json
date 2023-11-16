@@ -1,0 +1,29 @@
+{
+  "name": "@maxar/transform-ol",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Openlayers extension for use with @maxar/transform-api",
+  "author": "jerry.rumbolt@maxar.com",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Maxar-Corp/transform-ol-ts.git"
+  },
+  "main": "./dist/src/index.js",
+  "typings": "./dist/src/index.d.ts",
+  "scripts": {
+    "clean": "tsc --build --clean",
+    "build": "tsc",
+    "prepare": "npm run build"
+  },
+  "dependencies": {
+    "@chunkd/source-http": "^11.1.0",
+    "@maxar/cogeotiff-core": "https://github.com/Maxar-Corp/cogeotiff-core-ts.git",
+    "@maxar/transform-api": "https://github.com/Maxar-Corp/transform-api-ts.git",
+    "ol": "^8.2.0",
+    "proj4": "^2.9.2"
+  },
+  "devDependencies": {
+    "typescript": "^5.2.2"
+  }
+}
