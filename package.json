@@ -17,7 +17,7 @@
     "prepack": "npm run build",
     "prepare": "npm run build"
   },
-  "dependencies": {
+  "peerDependencies":{
     "@chunkd/source-http": "^11.1.0",
     "@maxar/cogeotiff-core": "https://github.com/Maxar-Corp/cogeotiff-core-ts.git",
     "@maxar/transform-api": "https://github.com/Maxar-Corp/transform-api-ts.git",

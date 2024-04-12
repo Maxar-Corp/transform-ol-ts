@@ -1,7 +1,8 @@
-import Projection from "ol/proj/Projection.js";
-import {get as getProjection} from 'ol/proj.js';
 import proj4 from "proj4";
-import {register} from "ol/proj/proj4.js";
+import Projection from "ol/proj/Projection.js";
+import { register, fromEPSGCode} from "ol/proj/proj4.js";
+import {get as getProjection} from 'ol/proj.js';
+
 import {Extent} from 'ol/extent.js'
 /**
  * 
@@ -9,6 +10,8 @@ import {Extent} from 'ol/extent.js'
  * @returns 
  */
 export async function makeProjectionFromEpsgCode(code: number) : Promise<Projection> {
+    let retval = getProjection(`EPSG:${code}`);
+    if(retval !== null) return retval;
     const epsgio_url = `https://epsg.io/?format=json&q=${code}`;
     const repsonse = await fetch(epsgio_url, {
         mode: 'cors',
@@ -43,10 +46,18 @@ export async function makeProjectionFromEpsgCode(code: number) : Promise<Project
     proj4.defs(newProjCode, proj4def);
     register(proj4);
 
-    const projection = getProjection(newProjCode);
-    if(typeof projection === 'undefined' || projection === null) throw new Error(`Unable to create ol/projection for code=${code}`);
-    projection.setExtent([minx, miny, maxx, maxy]);
-    return projection;
+    retval = getProjection(newProjCode);
+    if(typeof retval === 'undefined' || retval === null) throw new Error(`Unable to create ol/projection for code=${code}`);
+    retval.setExtent([minx, miny, maxx, maxy]);
+
+    let worldExtent = result['bbox'];
+    // approximate calculation of projection extent,
+    // checking if the world extent crosses the dateline
+    if (worldExtent[1] > worldExtent[3]) {
+        worldExtent = [worldExtent[1], worldExtent[2], worldExtent[3] + 360, worldExtent[0]];
+      }
+    retval.setWorldExtent(worldExtent);
+    return retval;
    
 }
 
