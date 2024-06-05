@@ -869,7 +869,7 @@ class GeoTIFFSource extends DataTile {
               data[didx[0]] = pixVal;
               if(addAlpha)
               {
-                pixVal === 0 ? data[didx[1]] = 0 : data[didx[1]] = 255;
+                pixVal === clampValue(gain, bias, 0) ? data[didx[1]] = 0 : data[didx[1]] = 255;
               }
             }
               break;
@@ -878,12 +878,13 @@ class GeoTIFFSource extends DataTile {
               const r = normalize ? clampValue(gain, bias, view[sidx[0]]) : view[sidx[0]];
               const g = normalize ? clampValue(gain, bias, view[sidx[1]]) : view[sidx[1]];
               const b = normalize ? clampValue(gain, bias, view[sidx[2]]) : view[sidx[2]];
+              const transparent = normalize ? clampValue(gain, bias, 0) : 0;
               data[didx[0]] = r;
               data[didx[1]] = g;
               data[didx[2]] = b;
               if(addAlpha)
               {
-                r === 0 && g === 0 && b === 0 ? data[didx[3]] = 0 : data[didx[3]] = 255;
+                r === transparent && g === transparent && b === transparent ? data[didx[3]] = 0 : data[didx[3]] = 255;
               }
             }
           }
