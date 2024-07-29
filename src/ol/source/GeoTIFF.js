@@ -380,6 +380,7 @@ class GeoTIFFSource extends DataTile {
       transition: options.transition,
       interpolate: options.interpolate !== false,
       wrapX: options.wrapX,
+      attributions: options.attributions,
     });
 
     /**
