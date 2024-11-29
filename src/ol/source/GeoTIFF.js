@@ -72,7 +72,6 @@ function isMask(image) {
 const STATISTICS_MAXIMUM = 'STATISTICS_MAXIMUM';
 const STATISTICS_MINIMUM = 'STATISTICS_MINIMUM';
 
-const defaultTileSize = 256;
 
 /**
  * @typedef {import("@maxar/cogeotiff-core").CogTiffImage} CogTiffImage
@@ -598,16 +597,6 @@ class GeoTIFFSource extends DataTile {
         sourceResolutions[level] = imageResolutions[0];
 
         const sourceTileSize = [image.tileSize.width, image.tileSize.height];
-
-        // request larger blocks for untiled layouts
-        if (
-            sourceTileSize[0] !== sourceTileSize[1] &&
-            sourceTileSize[1] < defaultTileSize
-        ) {
-          sourceTileSize[0] = defaultTileSize;
-          sourceTileSize[1] = defaultTileSize;
-        }
-
         sourceTileSizes[level] = sourceTileSize;
 
         const aspectRatio = imageResolutions[0] / Math.abs(imageResolutions[1]);

@@ -11,7 +11,7 @@ import {Extent} from 'ol/extent.js'
  */
 export async function makeProjectionFromEpsgCode(code: number) : Promise<Projection> {
     let retval = getProjection(`EPSG:${code}`);
-    if(retval !== null) return retval;
+    if(retval !== null && retval.getExtent() !== null) return retval;
     const epsgio_url = `https://epsg.io/?format=json&q=${code}`;
     const repsonse = await fetch(epsgio_url, {
         mode: 'cors',

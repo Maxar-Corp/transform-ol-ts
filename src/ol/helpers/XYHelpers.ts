@@ -1,11 +1,12 @@
 import TileGrid from 'ol/tilegrid/TileGrid.js';
-import TileImage from "ol/source/TileImage.js";
+import DataTile from 'ol/source/DataTile.js';
 import Projection from "ol/proj/Projection.js";
 import {Extent} from 'ol/extent.js'
 import {TileRange} from "../../types.js";
-import {ImageTile} from "ol";
+
 import TileLayer from "ol/layer/WebGLTile.js";
 import Grid from "../source/Grid.js";
+
 
 export interface TileSize {width: number, height: number}
 
@@ -20,27 +21,19 @@ export function makeXYTileGrid (extent: Extent, resolutions: number[], tileSize:
 }
 
 
-
-export function makeXYTileImage (projection: Projection, extent: Extent, resolutions: number[], tileRange: TileRange, urlFunc: any, accessToken: string) : TileImage {
+export function makeXYTileImage (projection: Projection, extent: Extent, resolutions: number[], tileRange: TileRange, urlFunc: any, accessToken: string) : DataTile {
     const tileGrid =makeXYTileGrid(extent, resolutions,{width: tileRange.tileSizeX, height: tileRange.tileSizeY});
-    return new TileImage({
-        crossOrigin: null,
+    return new DataTile({
         projection: projection,
         tileGrid: tileGrid,
-
-        tileUrlFunction: function (coordinate) {
-            return urlFunc(coordinate[1], coordinate[2], tileRange);
-        }
-        ,tileLoadFunction: function(tile, src) {
-            const _tile = tile as ImageTile;
-            const image = _tile.getImage() as HTMLImageElement;
+        loader: async function (coordinate) {
             const headers = new Headers();
             headers.append('Authorization', `Bearer ${accessToken}`);
             //headers.append('Content-Type', 'image/png');
             headers.append('Accept', 'image/png');
 
-            const request = new Request(src);
-            fetch(request, {
+            const request = new Request(urlFunc(coordinate[1], coordinate[2], tileRange));
+            return await fetch(request, {
                 headers: headers,
                 mode: 'cors',
                 cache: 'default',
@@ -48,7 +41,9 @@ export function makeXYTileImage (projection: Projection, extent: Extent, resolut
             }).then(function(response) {
                 return response.blob();
             }).then(function(blob) {
+                const image = new Image();
                 image.src = URL.createObjectURL(blob);
+                return image;
             });
         }
     })
@@ -67,6 +62,7 @@ export function makeXYTileLayer (title: string, projection: Projection, extent: 
 }
 
 export function makeXYGridLayer(title: string, projection: Projection, extent: Extent, tileGrid: TileGrid, tileRange: TileRange) : TileLayer {
+    // @ts-ignore
     const layer = new TileLayer({
         visible: false,
         extent: extent,
