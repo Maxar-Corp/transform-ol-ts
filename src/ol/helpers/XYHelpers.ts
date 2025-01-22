@@ -1,5 +1,5 @@
 import TileGrid from 'ol/tilegrid/TileGrid.js';
-import DataTile from 'ol/source/DataTile.js';
+import ImageTile from 'ol/source/ImageTile.js';
 import Projection from "ol/proj/Projection.js";
 import {Extent} from 'ol/extent.js'
 import {TileRange} from "../../types.js";
@@ -20,19 +20,19 @@ export function makeXYTileGrid (extent: Extent, resolutions: number[], tileSize:
         });
 }
 
-
-export function makeXYTileImage (projection: Projection, extent: Extent, resolutions: number[], tileRange: TileRange, urlFunc: any, accessToken: string) : DataTile {
+var loadError = new Error("Image failed to load");
+export function makeXYTileImage (projection: Projection, extent: Extent, resolutions: number[], tileRange: TileRange, urlFunc: any, accessToken: string) : ImageTile {
     const tileGrid =makeXYTileGrid(extent, resolutions,{width: tileRange.tileSizeX, height: tileRange.tileSizeY});
-    return new DataTile({
+    return new ImageTile({
         projection: projection,
         tileGrid: tileGrid,
-        loader: async function (coordinate) {
+        loader: async function (requestZ, requestX, requestY, loaderOptions) {
             const headers = new Headers();
             headers.append('Authorization', `Bearer ${accessToken}`);
             //headers.append('Content-Type', 'image/png');
             headers.append('Accept', 'image/png');
 
-            const request = new Request(urlFunc(coordinate[1], coordinate[2], tileRange));
+            const request = new Request(urlFunc(requestX, requestY, tileRange, loaderOptions));
             return await fetch(request, {
                 headers: headers,
                 mode: 'cors',
@@ -41,9 +41,13 @@ export function makeXYTileImage (projection: Projection, extent: Extent, resolut
             }).then(function(response) {
                 return response.blob();
             }).then(function(blob) {
-                const image = new Image();
-                image.src = URL.createObjectURL(blob);
-                return image;
+                return new Promise((resolve, reject) => {
+                    const image = new Image();
+                    image.crossOrigin = loaderOptions.crossOrigin ?? null;
+                    image.addEventListener("load", () => resolve(image));
+                    image.addEventListener("error", () => reject(loadError));
+                    image.src = URL.createObjectURL(blob);
+                  });
             });
         }
     })
