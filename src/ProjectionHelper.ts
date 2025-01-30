@@ -12,7 +12,7 @@ import {Extent} from 'ol/extent.js'
 export async function makeProjectionFromEpsgCode(code: number) : Promise<Projection> {
     let retval = getProjection(`EPSG:${code}`);
     if(retval !== null && retval.getExtent() !== null) return retval;
-    const epsgio_url = `https://epsg.io/?format=json&q=${code}`;
+    const epsgio_url = `https://proj-api.transform.satcloud.us/epsg/${code}`;
     const repsonse = await fetch(epsgio_url, {
         mode: 'cors',
         cache: 'default'
@@ -21,16 +21,13 @@ export async function makeProjectionFromEpsgCode(code: number) : Promise<Project
     {
         throw {"projection error": `url=${epsgio_url} failed. code=${repsonse.status}.`};
     }
-    const json = await repsonse.json();
-    const results = json['results'];
-    if (results.length < 1) throw {"projection error": `code=${code} not found`};
-    const result = results[0];
-    const proj4def = result['proj4'];
-    const extent = result['bbox']; // AREA_NORTH_BOUND_LAT, AREA_WEST_BOUND_LON, AREA_SOUTH_BOUND_LAT, AREA_EAST_BOUND_LON
-    let minx = extent[1];
-    let maxx = extent[3];
-    let miny = extent[2];
-    let maxy = extent[0];
+    const result = await repsonse.json();
+    const proj4def = result['proj'];
+    const extent = result['bounds']; // minx miny maxx maxy
+    let minx = extent[0];
+    let miny = extent[1];
+    let maxx = extent[2];
+    let maxy = extent[3];
 
     const p1 = proj4(proj4def,[minx, miny]);
     const p2 = proj4(proj4def,[maxx, miny]);
@@ -50,11 +47,11 @@ export async function makeProjectionFromEpsgCode(code: number) : Promise<Project
     if(typeof retval === 'undefined' || retval === null) throw new Error(`Unable to create ol/projection for code=${code}`);
     retval.setExtent([minx, miny, maxx, maxy]);
 
-    let worldExtent = result['bbox'];
+    let worldExtent = result['bounds'];
     // approximate calculation of projection extent,
     // checking if the world extent crosses the dateline
-    if (worldExtent[1] > worldExtent[3]) {
-        worldExtent = [worldExtent[1], worldExtent[2], worldExtent[3] + 360, worldExtent[0]];
+    if (worldExtent[0] > worldExtent[2]) {
+        worldExtent = [worldExtent[0], worldExtent[1], worldExtent[2] + 360, worldExtent[3]];
       }
     retval.setWorldExtent(worldExtent);
     return retval;
