@@ -3,7 +3,7 @@
  */
 import DataTile from 'ol/source/DataTile.js';
 import TileGrid from 'ol/tilegrid/TileGrid.js';
-
+import Projection from "ol/proj/Projection.js";
 import {get as getCachedProjection, toUserCoordinate, toUserExtent,} from 'ol/proj.js';
 import {SourceHttp} from '@chunkd/source-http';
 import {SourceView} from '@chunkd/source';
@@ -511,15 +511,28 @@ class GeoTIFFSource extends DataTile {
    * from a single GeoTIFF.
    */
   determineProjection(sources) {
+    let ret_proj = null
     const firstSource = sources[0];
     for (let i = firstSource.length - 1; i >= 0; --i) {
       const image = firstSource[i];
       const projection = getProjection(image);
       if (projection) {
-        this.projection = projection;
+        ret_proj = projection;
         break;
       }
     }
+    if(!ret_proj)
+    {
+      const image = firstSource[0];
+      const width = image.size.width;
+      const height = image.size.height;
+      ret_proj = new Projection({
+        code: 'xkcd-image',
+        units: 'pixels',
+        extent: [0,0,width,height]
+      });
+    }
+    return ret_proj
   }
 
   /**
@@ -679,7 +692,7 @@ class GeoTIFFSource extends DataTile {
     }
 
     if (!this.getProjection()) {
-      this.determineProjection(sources);
+      this.projection = this.determineProjection(sources);
     }
 
 
