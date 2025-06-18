@@ -18,14 +18,14 @@
     "prepare": "npm run build"
   },
   "peerDependencies":{
-    "@chunkd/source-http": "^11.1.0",
+    "@chunkd/source-http": "11.1.0",
     "@maxar/cogeotiff-core": "https://github.com/Maxar-Corp/cogeotiff-core-ts.git",
-		"@maxar/transform-api": "https://github.com/Maxar-Corp/transform-api-ts.git",
-    "ol": "^10.4.0",
-    "proj4": "^2.15.0"
+    "@maxar/transform-api": "https://github.com/Maxar-Corp/transform-api-ts.git",
+    "ol": "10.4.0",
+    "proj4": "2.15.0"
   },
   "devDependencies": {
-    "typescript": "^5.7.3"
+    "typescript": "5.7.3"
   },
   "publishConfig": {
     "access": "public"
