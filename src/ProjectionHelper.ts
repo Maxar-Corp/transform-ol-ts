@@ -1,3 +1,4 @@
+// @ts-ignore
 import proj4 from "proj4";
 import Projection from "ol/proj/Projection.js";
 import { register, fromEPSGCode} from "ol/proj/proj4.js";
