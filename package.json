@@ -17,15 +17,15 @@
     "prepack": "npm run build",
     "prepare": "npm run build"
   },
-  "peerDependencies":{
-    "@chunkd/source-http": "11.1.0",
+  "peerDependencies": {
+    "@chunkd/source-http": "11.4.0",
     "@maxar/cogeotiff-core": "https://github.com/Maxar-Corp/cogeotiff-core-ts.git#1.1.0",
 		"@maxar/transform-api": "https://github.com/Maxar-Corp/transform-api-ts.git#1.1.0",
-    "ol": "^10.7.0",
+    "ol": "^10.9.0",
     "proj4": "^2.20.0"
   },
   "devDependencies": {
-    "typescript": "^5.9.3"
+    "typescript": "^6.0.3"
   },
   "publishConfig": {
     "access": "public"
