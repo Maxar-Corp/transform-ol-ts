@@ -1,6 +1,8 @@
 ## @maxar/transform-ol
 
-Helpers and custom GeoTIFF source for use with OpenLayer 9.x. Not currently supported for OpenLayers 10.0.0
+Helpers and custom GeoTIFF source for use with OpenLayers 10.9.0+.
+
+See [DEVELOPER_GUIDE.md](./DEVELOPER_GUIDE.md) for usage examples and an API reference.
 
 Language level
 * ES6

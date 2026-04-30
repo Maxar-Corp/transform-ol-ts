@@ -160,7 +160,10 @@ function getImagesForSource(source, options) {
     if (Object.prototype.hasOwnProperty.call(options, 'headerSize')) headerSize = options['headerSize'];
     let tileSize;
     if (Object.prototype.hasOwnProperty.call(options, 'tileSize')) tileSize = options['tileSize'];
-    return CogTiff.createEx(tiffSource, headerSize, tileSize).then((tiff) => tiff.images);
+    return CogTiff.createEx(tiffSource, headerSize, tileSize).then(async (tiff) => {
+      await Promise.all(tiff.images.map((image) => image.preload()));
+      return tiff.images;
+    });
   }
 
 }
